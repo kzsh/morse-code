@@ -1,0 +1,27 @@
+.wrappingLabel {
+  margin-bottom: 0.125em;
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  display: block;
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-bottom: 0.25em;
+}
+
+.input {
+  font-size: 1.5em;
+  margin-bottom: 0.625em;
+}
+
+.description {
+  color: #AAA;
+}
+
+@media (prefers-color-scheme: dark) {
+  .label, .description {
+    font-size: 1.1em;
+  }
+}

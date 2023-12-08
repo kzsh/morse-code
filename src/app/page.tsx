@@ -68,17 +68,20 @@ export default function Home() {
 
   return (
     <main className={styles.main}>
-      <form className={styles.morseForm} onSubmit={(e) => {
+      <form className={styles.form} onSubmit={(e) => {
         e.preventDefault();
         run();
       }}>
         <Field 
+          autoFocus
           _ref={messageRef}
           label="Message" 
           value={message}
+          description="Type a message here to encode it into morse code."
           setValue={setMessage}
         />
         <Field 
+          label="Encoded Message"
           _ref={encodedMessageRef}
           description="Morse-encoded message. Spaces indicate pauses between characters and words." 
           value={encodedMessage}
@@ -86,11 +89,14 @@ export default function Home() {
         />
         <Field
           type="number"
+          label="Cadence"
+          description="playback rate in ms (lower is faster)"
           value={cadence}
           setValue={setCadence}
         />
-        <button type="submit">
-          Play (or hit enter)
+        <button className={styles.button} type="submit">
+          <p>Play</p> 
+          <p className={styles.button__hint}>(or hit enter)</p>
         </button>
       </form>
     </main>
