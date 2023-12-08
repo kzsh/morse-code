@@ -1,5 +1,7 @@
 'use client'
 import {useCallback, useEffect, useState, useRef} from 'react';
+
+import {Field} from '@/components';
 import {alphanumericTest} from './utils';
 import {MorseReader, translateMessage} from './morse';
 import {INTERACTION_KEYS, VALID_MORSE_CODE} from './constants';
@@ -19,7 +21,7 @@ export default function Home() {
   const messageRef = useRef<HTMLInputElement>(null)
   const encodedMessageRef = useRef<HTMLInputElement>(null)
 
-  const [cadence, setCadence] = useState(80);
+  const [cadence, setCadence] = useState('80');
   const [message, setMessage] = useState('');
   const [encodedMessage, setEncodedMessage] = useState('');
 
@@ -59,8 +61,8 @@ export default function Home() {
   const run = useCallback(() => {
     const frequency = 500;
 
-    if(encodedMessage.length && cadence > 0) {
-      new MorseReader(AUDIO_CONTEXT, encodedMessage, cadence, frequency);
+    if(encodedMessage.length && +cadence > 0) {
+      new MorseReader(AUDIO_CONTEXT, encodedMessage, +cadence, frequency);
     }
   }, [cadence, encodedMessage])
 
@@ -70,19 +72,24 @@ export default function Home() {
         e.preventDefault();
         run();
       }}>
-        <label>
-          <input ref={messageRef} onChange={({target: {value}}) => setMessage(value)} value={message} type="text" /> 
-          <span>Message</span>
-        </label> 
-        <label>
-          <input ref={encodedMessageRef} value={encodedMessage} type="text" /> 
-          <span>Morse-encoded message. Spaces indicate pauses between characters and words.</span>
-        </label> 
-        <label>
-          <input onChange={(e) => setCadence(+e.target.value)} type="number" value={cadence}/>
-          <span>playback rate in ms (lower is faster)</span>
-        </label>
-        <button type="submit"> 
+        <Field 
+          _ref={messageRef}
+          label="Message" 
+          value={message}
+          setValue={setMessage}
+        />
+        <Field 
+          _ref={encodedMessageRef}
+          description="Morse-encoded message. Spaces indicate pauses between characters and words." 
+          value={encodedMessage}
+          setValue={setEncodedMessage}
+        />
+        <Field
+          type="number"
+          value={cadence}
+          setValue={setCadence}
+        />
+        <button type="submit">
           Play (or hit enter)
         </button>
       </form>
