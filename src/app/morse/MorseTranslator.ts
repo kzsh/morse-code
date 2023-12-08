@@ -1,20 +1,18 @@
 import {ALPHA_MORSE_MAP} from '@/app/constants';
 import {debug} from '@/app/utils';
 
-/**
- * MorseTranslator
- * turn a string of periods, dashes and spaces into morse code sounds
- */ 
+type ValueOf<T> = T[keyof T]; 
 
-export class MorseTranslator {
-  constructor() {}
-  translateMessage(message) {
-    return message.split('').map(function(char) {
-      if (char === ' ') {
-        return '  ';
-      }
-      debug(char.toUpperCase(),'=>', ALPHA_MORSE_MAP[char.toUpperCase()]);
-      return ALPHA_MORSE_MAP[char.toUpperCase()] + ' ';
-    }).join('');
-  }
+type Code = ValueOf<typeof ALPHA_MORSE_MAP>
+type KeyCode = keyof typeof ALPHA_MORSE_MAP
+
+export const translateMessage = (message: string) => {
+  return (message.toUpperCase().split('') as Array<KeyCode | ' '>).map((char) => {
+    if (char === ' ') {
+      return '  ';
+    } else {
+      debug(char.toUpperCase(),'=>', ALPHA_MORSE_MAP[char]);
+      return ALPHA_MORSE_MAP[char] + ' ';
+    }
+  }).join('');
 }
