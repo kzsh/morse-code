@@ -3,8 +3,14 @@
  * turn a string of periods, dashes and spaces into morse code sounds
  */ 
 export class MorseReader {
-  constructor(context, message, cadence = 200, frequency = 500) {
-    this.context = context;
+  audioContext: AudioContext;
+  message: string;
+  cadence: number;
+  frequency: number;
+  interWordPauseDuration: number;
+
+  constructor(audioContext: AudioContext, message: string, cadence = 200, frequency = 500) {
+    this.audioContext = audioContext;
     this.message = message;
     this.cadence = cadence;
     this.frequency = frequency;
@@ -14,21 +20,21 @@ export class MorseReader {
 
 
   createOscillator() {
-    const oscillator = this.context.createOscillator();
+    const oscillator = this.audioContext.createOscillator();
     const gainNode = this.createGainNode();
     oscillator.type = 'sine';
     oscillator.frequency.value = this.frequency;
     oscillator.connect(gainNode);
-    gainNode.connect(this.context.destination);
+    gainNode.connect(this.audioContext.destination);
 
-    const context = this.context;
+    const audioContext = this.audioContext;
     return {
       start() {
         oscillator.start();
       },
       stop() {
-        gainNode.gain.setValueAtTime(gainNode.gain.value, context.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 0.007);
+        gainNode.gain.setValueAtTime(gainNode.gain.value, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.007);
         setTimeout(function() {
           oscillator.stop();
         }, 10);
@@ -37,10 +43,10 @@ export class MorseReader {
   }
 
   createGainNode() {
-   return this.context.createGain();
+   return this.audioContext.createGain();
   }
 
-  readMessage(message, cadence) {
+  readMessage(message: string, cadence: number) {
     const words = message.split(' ');
     let accumulatedLength = 0;
     words.forEach((word) => {
@@ -51,7 +57,7 @@ export class MorseReader {
 
   }
 
-  readWord(word, cadence, durationOffset) {
+  readWord(word: string, cadence: number, durationOffset: number) {
     let nextChar = 0;
     setTimeout(() => {
       const interval = setInterval(() => {
@@ -64,7 +70,7 @@ export class MorseReader {
     }, durationOffset);
   }
 
-  readCharacter(char) {
+  readCharacter(char: string) {
     switch(char) {
       case '.': {
         this.playDot();
@@ -89,7 +95,7 @@ export class MorseReader {
    this.playSound(this.cadence * 8/10);
   }
 
-  playSound(duration) {
+  playSound(duration: number) {
     const oscillator = this.createOscillator();
     oscillator.start();
 

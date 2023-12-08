@@ -1,7 +1,7 @@
 'use client'
 import {useCallback, useEffect, useState, useRef} from 'react';
 import {alphanumericTest} from './utils';
-import {MorseReader, MorseTranslator} from './morse';
+import {MorseReader, translateMessage} from './morse';
 import {INTERACTION_KEYS, VALID_MORSE_CODE} from './constants';
 
 import styles from './page.module.css'
@@ -14,8 +14,6 @@ const AUDIO_CONTEXT = (function createLocalAudioContext(window) {
     throw new Error('Web Audio API is not supported in this browser');
   }
 }(window));
-
-const MORSE_TRANSLATOR = new MorseTranslator();
 
 export default function Home() {
   const messageRef = useRef<HTMLInputElement>(null)
@@ -38,7 +36,7 @@ export default function Home() {
       });
 
       messageElement.addEventListener('keyup',() => {
-        setEncodedMessage(MORSE_TRANSLATOR.translateMessage(messageElement.value));
+        setEncodedMessage(translateMessage(messageElement.value));
       });
 
     }

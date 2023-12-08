@@ -1,3 +1,3 @@
 export {MorseReader} from './MorseReader'
-export {MorseTranslator} from './MorseTranslator'
+export {translateMessage} from './MorseTranslator'
 
