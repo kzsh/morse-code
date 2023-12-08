@@ -66,25 +66,25 @@ export default function Home() {
 
   return (
     <main className={styles.main}>
-    <form className={styles.morseForm} onSubmit={(e) => {
-      e.preventDefault();
-      run();
-    }}>
-      <label>
-        <input ref={messageRef} onChange={({target: {value}}) => setMessage(value)} value={message} type="text" /> 
-        <span>Message</span>
-      </label> 
-      <label>
-        <input ref={encodedMessageRef} value={encodedMessage} type="text" /> 
-        <span>Morse-encoded message. Spaces indicate pauses between characters and words.</span>
-      </label> 
-      <label>
-        <input onChange={(e) => setCadence(+e.target.value)} type="number" value={cadence}/>
-        <span>playback rate in ms (lower is faster)</span>
-      </label>
-      <button type="submit"> 
-        Play (or hit enter)
-      </button>
+      <form className={styles.morseForm} onSubmit={(e) => {
+        e.preventDefault();
+        run();
+      }}>
+        <label>
+          <input ref={messageRef} onChange={({target: {value}}) => setMessage(value)} value={message} type="text" /> 
+          <span>Message</span>
+        </label> 
+        <label>
+          <input ref={encodedMessageRef} value={encodedMessage} type="text" /> 
+          <span>Morse-encoded message. Spaces indicate pauses between characters and words.</span>
+        </label> 
+        <label>
+          <input onChange={(e) => setCadence(+e.target.value)} type="number" value={cadence}/>
+          <span>playback rate in ms (lower is faster)</span>
+        </label>
+        <button type="submit"> 
+          Play (or hit enter)
+        </button>
       </form>
     </main>
   )
