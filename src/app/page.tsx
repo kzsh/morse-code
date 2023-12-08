@@ -1,95 +1,93 @@
-import Image from 'next/image'
+'use client'
+import {useCallback, useEffect, useState, useRef} from 'react';
+import {alphanumericTest} from './utils';
+import {MorseReader, MorseTranslator} from './morse';
+import {INTERACTION_KEYS, VALID_MORSE_CODE} from './constants';
+
 import styles from './page.module.css'
 
+const AUDIO_CONTEXT = (function createLocalAudioContext(window) {
+  try {
+    return new window.AudioContext();
+  } catch (e) {
+    console.error(e)
+    throw new Error('Web Audio API is not supported in this browser');
+  }
+}(window));
+
+const MORSE_TRANSLATOR = new MorseTranslator();
+
 export default function Home() {
+  const messageRef = useRef<HTMLInputElement>(null)
+  const encodedMessageRef = useRef<HTMLInputElement>(null)
+
+  const [cadence, setCadence] = useState(80);
+  const [message, setMessage] = useState('');
+  const [encodedMessage, setEncodedMessage] = useState('');
+
+  useEffect(() => {
+    const messageElement= messageRef?.current;
+    const encodedMessageElement = encodedMessageRef?.current;
+    if(messageElement && encodedMessageElement) {
+      messageElement.addEventListener('keydown',(e) => {
+        // Test for the key codes you want to filter out.
+        const isValidKey = alphanumericTest(e.keyCode) || INTERACTION_KEYS.some(c => e.keyCode === c);
+        if (!isValidKey) {
+          e.preventDefault();
+        } 
+      });
+
+      messageElement.addEventListener('keyup',() => {
+        setEncodedMessage(MORSE_TRANSLATOR.translateMessage(messageElement.value));
+      });
+
+    }
+  }, [messageRef, encodedMessageRef])
+
+  useEffect(() => {
+    const current = encodedMessageRef?.current;
+    if(current) {
+      current.addEventListener('keydown', (e) => {
+        // Test for the key codes you want to filter out.
+        const codes = [...INTERACTION_KEYS,...VALID_MORSE_CODE];
+        const isValidKey = codes.some(c => e.keyCode === c);
+        if (!isValidKey) {
+          e.preventDefault();
+        }
+      })
+    }
+  }, [encodedMessageRef])
+
+  const run = useCallback(() => {
+    const frequency = 500;
+
+    if(encodedMessage.length && cadence > 0) {
+      new MorseReader(AUDIO_CONTEXT, encodedMessage, cadence, frequency);
+    }
+  }, [cadence, encodedMessage])
+
   return (
     <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+    <form className={styles.morseForm} onSubmit={(e) => {
+      e.preventDefault();
+      run();
+    }}>
+      <label>
+        <input ref={messageRef} onChange={({target: {value}}) => setMessage(value)} value={message} type="text" /> 
+        <span>Message</span>
+      </label> 
+      <label>
+        <input ref={encodedMessageRef} value={encodedMessage} type="text" /> 
+        <span>Morse-encoded message. Spaces indicate pauses between characters and words.</span>
+      </label> 
+      <label>
+        <input onChange={(e) => setCadence(+e.target.value)} type="number" value={cadence}/>
+        <span>playback rate in ms (lower is faster)</span>
+      </label>
+      <button type="submit"> 
+        Play (or hit enter)
+      </button>
+      </form>
     </main>
   )
 }
