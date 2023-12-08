@@ -5,17 +5,9 @@ import {Field} from '@/components';
 import {alphanumericTest} from './utils';
 import {MorseReader, translateMessage} from './morse';
 import {INTERACTION_KEYS, VALID_MORSE_CODE} from './constants';
+import {AUDIO_CONTEXT}  from '@/modules';
 
 import styles from './page.module.css'
-
-const AUDIO_CONTEXT = (function createLocalAudioContext(window) {
-  try {
-    return new window.AudioContext();
-  } catch (e) {
-    console.error(e)
-    throw new Error('Web Audio API is not supported in this browser');
-  }
-}(window));
 
 export default function Home() {
   const messageRef = useRef<HTMLInputElement>(null)
