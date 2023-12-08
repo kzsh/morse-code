@@ -6,9 +6,17 @@
   padding: 6rem;
   min-height: 100vh;
 }
-.morseForm {
+
+.form {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 2rem;
+  gap: 2em;
+}
+
+.button {
+  padding: 2em;
+}
+.button__hint {
+  color: #AAAAAA;
 }
